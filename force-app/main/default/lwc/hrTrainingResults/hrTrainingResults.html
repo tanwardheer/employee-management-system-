@@ -1,0 +1,85 @@
+<template>
+    <lightning-card title="HR Training Results" icon-name="standard:education">
+        <div class="slds-p-around_medium slds-is-relative">
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Loading training results" size="small">
+                </lightning-spinner>
+            </template>
+
+            <p class="slds-m-bottom_medium">
+                Filter training assignments and update scores from 0 to 100. Leave a score blank to clear it.
+            </p>
+
+            <div class="slds-grid slds-wrap slds-gutters slds-m-bottom_medium">
+                <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-3">
+                    <lightning-record-picker
+                        label="Employee"
+                        placeholder="Search employees"
+                        object-api-name="Employee__c"
+                        onchange={handleEmployeeChange}>
+                    </lightning-record-picker>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-3">
+                    <lightning-record-picker
+                        label="Training"
+                        placeholder="Search trainings"
+                        object-api-name="Training__c"
+                        onchange={handleTrainingChange}>
+                    </lightning-record-picker>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-3">
+                    <lightning-combobox
+                        label="Status"
+                        value={statusFilter}
+                        options={statusOptions}
+                        onchange={handleStatusChange}>
+                    </lightning-combobox>
+                </div>
+            </div>
+
+            <template if:true={errorMessage}>
+                <div class="slds-text-color_error slds-m-bottom_medium" role="alert">
+                    {errorMessage}
+                </div>
+            </template>
+
+            <template if:true={hasRows}>
+                <div class="slds-grid slds-wrap slds-grid_align-spread slds-grid_vertical-align-center slds-m-bottom_x-small">
+                    <p class="slds-text-color_weak">
+                        Showing up to 200 matching assignments. Add filters to narrow the results.
+                    </p>
+                    <lightning-button
+                        label="Export CSV"
+                        icon-name="utility:download"
+                        onclick={handleExport}
+                        disabled={hasDrafts}
+                        title="Download the filtered assignments shown here as a CSV file">
+                    </lightning-button>
+                </div>
+                <template if:true={hasDrafts}>
+                    <p class="slds-text-color_weak slds-m-bottom_x-small">
+                        Save or cancel score edits before exporting.
+                    </p>
+                </template>
+                <lightning-datatable
+                    key-field="id"
+                    data={rows}
+                    columns={columns}
+                    draft-values={drafts}
+                    onsave={handleSave}
+                    oncancel={handleCancel}
+                    is-loading={isSaving}
+                    hide-checkbox-column>
+                </lightning-datatable>
+            </template>
+
+            <template if:false={hasRows}>
+                <template if:false={errorMessage}>
+                    <template if:false={isLoading}>
+                        <p>No training assignments match these filters.</p>
+                    </template>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>

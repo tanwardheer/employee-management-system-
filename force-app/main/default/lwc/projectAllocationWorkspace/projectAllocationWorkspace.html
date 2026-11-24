@@ -1,0 +1,91 @@
+<template>
+    <lightning-card title="Project Allocation Workspace" icon-name="standard:work_order">
+        <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+            <p class="slds-text-body_small slds-m-bottom_medium">
+                Choose an active employee and a project to create an allocation.
+            </p>
+
+            <div class="slds-grid slds-wrap slds-gutters_small slds-grid_vertical-align-end">
+                <div class="slds-col slds-size_1-of-1 slds-large-size_4-of-12">
+                    <lightning-record-picker
+                        label="Employee"
+                        placeholder="Search by employee name or code"
+                        object-api-name="Employee__c"
+                        display-info={employeeDisplayInfo}
+                        matching-info={employeeMatchingInfo}
+                        filter={activeEmployeeFilter}
+                        value={employeeId}
+                        onchange={handleEmployeeChange}
+                        required
+                    ></lightning-record-picker>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-large-size_4-of-12">
+                    <lightning-record-picker
+                        label="Project"
+                        placeholder="Search by project name or code"
+                        object-api-name="Project__c"
+                        display-info={projectDisplayInfo}
+                        matching-info={projectMatchingInfo}
+                        value={projectId}
+                        onchange={handleProjectChange}
+                        required
+                    ></lightning-record-picker>
+                </div>
+                <div class="slds-col slds-size_1-of-2 slds-large-size_1-of-12">
+                    <lightning-input
+                        type="date"
+                        label="Start date"
+                        value={allocationStartDate}
+                        onchange={handleStartDateChange}
+                    ></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-2 slds-large-size_1-of-12">
+                    <lightning-input
+                        type="date"
+                        label="End date"
+                        value={allocationEndDate}
+                        min={allocationStartDate}
+                        onchange={handleEndDateChange}
+                    ></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-large-size_2-of-12">
+                    <lightning-button
+                        label="Assign project"
+                        variant="brand"
+                        onclick={handleAssign}
+                        disabled={isAssignDisabled}
+                        class="slds-m-top_small"
+                    ></lightning-button>
+                </div>
+            </div>
+
+            <template lwc:if={isSaving}>
+                <lightning-spinner alternative-text="Assigning project" size="small"></lightning-spinner>
+            </template>
+
+            <div class="slds-m-top_large">
+                <div class="slds-grid slds-grid_align-spread slds-m-bottom_x-small">
+                    <h2 class="slds-text-heading_small">Recent project allocations</h2>
+                    <span class="slds-text-body_small">{allocationCount} shown (up to 200)</span>
+                </div>
+
+                <template lwc:if={hasLoadError}>
+                    <div class="slds-text-color_error" role="alert">{loadError}</div>
+                </template>
+                <template lwc:elseif={hasAllocations}>
+                    <lightning-datatable
+                        key-field="allocationId"
+                        data={allocationRows}
+                        columns={columns}
+                        hide-checkbox-column
+                    ></lightning-datatable>
+                </template>
+                <template lwc:else>
+                    <div class="slds-box slds-theme_default slds-text-align_center">
+                        No project allocations are available yet.
+                    </div>
+                </template>
+            </div>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,97 @@
+
+<template>
+    <lightning-card title="Assign Training" icon-name="standard:education">
+        <div class="slds-p-around_medium slds-is-relative">
+            <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_medium">
+                {assignmentInstructions} The assigned date defaults to today.
+            </p>
+
+            <template if:true={isLoading}>
+                <lightning-spinner
+                    alternative-text="Assigning training"
+                    size="small">
+                </lightning-spinner>
+            </template>
+
+            <lightning-combobox
+                label="Assign To"
+                value={assignmentMode}
+                options={assignmentModeOptions}
+                disabled={isLoading}
+                onchange={handleAssignmentModeChange}>
+            </lightning-combobox>
+
+            <template if:true={isEmployeeMode}>
+                <div class="slds-m-top_medium">
+                    <lightning-record-picker
+                        label="Select Employee"
+                        placeholder="Search employees..."
+                        object-api-name="Employee__c"
+                        filter={employeeFilter}
+                        disabled={isLoading}
+                        onchange={handleEmployeeChange}
+                        required>
+                    </lightning-record-picker>
+                </div>
+            </template>
+
+            <template if:true={isDepartmentMode}>
+                <div class="slds-m-top_medium">
+                    <lightning-record-picker
+                        label="Select Department"
+                        placeholder="Search departments..."
+                        object-api-name="departement__c"
+                        disabled={isLoading}
+                        onchange={handleDepartmentChange}
+                        required>
+                    </lightning-record-picker>
+                </div>
+            </template>
+
+            <div class="slds-m-top_medium">
+                <lightning-record-picker
+                    label="Select Training"
+                    placeholder="Search training programs..."
+                    object-api-name="Training__c"
+                    filter={trainingFilter}
+                    disabled={isLoading}
+                    onchange={handleTrainingChange}
+                    required>
+                </lightning-record-picker>
+            </div>
+
+            <div class="slds-m-top_medium">
+                <lightning-input
+                    type="date"
+                    label="Assigned Date"
+                    value={assignedDate}
+                    required
+                    disabled={isLoading}
+                    onchange={handleDateChange}>
+                </lightning-input>
+            </div>
+
+            <div class="slds-m-top_medium">
+                <lightning-input
+                    type="date"
+                    label={dueDateLabel}
+                    value={dueDate}
+                    min={assignedDate}
+                    required
+                    disabled={isLoading}
+                    onchange={handleDueDateChange}>
+                </lightning-input>
+            </div>
+
+            <div class="slds-m-top_large">
+                <lightning-button
+                    label={assignButtonLabel}
+                    variant="brand"
+                    onclick={handleAssign}
+                    disabled={isAssignDisabled}>
+                </lightning-button>
+            </div>
+
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,142 @@
+<template>
+    <lightning-card title="My Trainings" icon-name="standard:education">
+        <div class="slds-p-around_medium slds-is-relative">
+            <template if:true={isLoading}>
+                <lightning-spinner
+                    alternative-text="Loading your trainings"
+                    size="small">
+                </lightning-spinner>
+            </template>
+
+            <template if:true={errorMessage}>
+                <div class="slds-text-color_error" role="alert">
+                    {errorMessage}
+                </div>
+            </template>
+
+            <template if:true={hasAssignments}>
+                <div class="slds-m-bottom_medium">
+                    <lightning-combobox
+                        label="Filter trainings"
+                        value={statusFilter}
+                        options={filterOptions}
+                        onchange={handleStatusFilterChange}>
+                    </lightning-combobox>
+                </div>
+                <template if:true={hasFilteredAssignments}>
+                    <template for:each={statusGroups} for:item="group">
+                        <section key={group.key} class="slds-m-bottom_large">
+                        <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                            <h2 class="slds-text-heading_medium">{group.label}</h2>
+                            <span class="slds-badge slds-m-left_small">{group.count}</span>
+                        </div>
+
+                        <template if:true={group.hasAssignments}>
+                            <template for:each={group.assignments} for:item="assignment">
+                                <article
+                                    key={assignment.id}
+                                    class="slds-box slds-m-bottom_medium"
+                                    aria-label={assignment.trainingName}>
+                                    <h3 class="slds-text-heading_small slds-m-bottom_small">
+                                        {assignment.trainingName}
+                                    </h3>
+
+                                    <dl class="slds-grid slds-wrap slds-m-bottom_medium">
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-around_x-small">
+                                            <dt class="slds-text-title">Training Code</dt>
+                                            <dd>{assignment.trainingCode}</dd>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-around_x-small">
+                                            <dt class="slds-text-title">Category</dt>
+                                            <dd>{assignment.trainingCategory}</dd>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-around_x-small">
+                                            <dt class="slds-text-title">Duration (hours)</dt>
+                                            <dd>{assignment.durationHours}</dd>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-around_x-small">
+                                            <dt class="slds-text-title">Program Availability</dt>
+                                            <dd>{assignment.programStatus}</dd>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-around_x-small">
+                                            <dt class="slds-text-title">Assigned Date</dt>
+                                            <dd>{assignment.assignedDate}</dd>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-around_x-small">
+                                            <dt class="slds-text-title">Due Date</dt>
+                                            <dd>
+                                                <template if:true={assignment.dueDate}>
+                                                    <lightning-formatted-date-time
+                                                        value={assignment.dueDate}
+                                                        year="numeric"
+                                                        month="short"
+                                                        day="2-digit">
+                                                    </lightning-formatted-date-time>
+                                                </template>
+                                                <template if:false={assignment.dueDate}>Not set</template>
+                                            </dd>
+                                            <dd class={assignment.dueDateTone}>{assignment.dueDateMessage}</dd>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-around_x-small">
+                                            <dt class="slds-text-title">Score (read only)</dt>
+                                            <dd>{assignment.score}</dd>
+                                        </div>
+                                    </dl>
+
+                                    <lightning-combobox
+                                        label="Training Status"
+                                        value={assignment.status}
+                                        options={assignment.statusOptions}
+                                        data-assignment-id={assignment.id}
+                                        data-field="status"
+                                        onchange={handleFieldChange}
+                                        disabled={assignment.saveDisabled}>
+                                    </lightning-combobox>
+
+                                    <div class="slds-m-top_small">
+                                        <lightning-input
+                                            type="date"
+                                            label="Completion Date"
+                                            value={assignment.completionDate}
+                                            max={maxCompletionDate}
+                                            data-assignment-id={assignment.id}
+                                            data-field="completionDate"
+                                            onchange={handleFieldChange}
+                                            disabled={assignment.saveDisabled}>
+                                        </lightning-input>
+                                    </div>
+
+                                    <div class="slds-m-top_medium">
+                                        <lightning-button
+                                            label={assignment.saveLabel}
+                                            variant="brand"
+                                            data-assignment-id={assignment.id}
+                                            onclick={handleSave}
+                                            disabled={assignment.saveDisabled}>
+                                        </lightning-button>
+                                    </div>
+                                </article>
+                            </template>
+                        </template>
+
+                        <template if:false={group.hasAssignments}>
+                            <p class="slds-text-color_weak">No trainings in this category.</p>
+                        </template>
+                        </section>
+                    </template>
+                </template>
+                <template if:false={hasFilteredAssignments}>
+                    <p class="slds-text-color_weak">No trainings match this status or due-date filter.</p>
+                </template>
+            </template>
+
+            <template if:false={isLoading}>
+                <template if:false={errorMessage}>
+                    <template if:false={hasAssignments}>
+                        <p>{emptyMessage}</p>
+                    </template>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,79 @@
+<template>
+    <lightning-card title="Project Team" icon-name="standard:groups">
+        <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+            <p class="slds-text-body_small slds-m-bottom_medium">
+                Assign an active employee to this project and review their allocation dates.
+            </p>
+
+            <div class="slds-grid slds-wrap slds-gutters_small slds-grid_vertical-align-end">
+                <div class="slds-col slds-size_1-of-1 slds-large-size_5-of-12">
+                    <lightning-record-picker
+                        label="Active employee"
+                        placeholder="Search by employee name or code"
+                        object-api-name="Employee__c"
+                        display-info={employeeDisplayInfo}
+                        matching-info={employeeMatchingInfo}
+                        filter={employeeFilter}
+                        value={employeeId}
+                        onchange={handleEmployeeChange}
+                        required
+                    ></lightning-record-picker>
+                </div>
+                <div class="slds-col slds-size_1-of-2 slds-large-size_2-of-12">
+                    <lightning-input
+                        type="date"
+                        label="Allocation start date"
+                        value={allocationStartDate}
+                        onchange={handleStartDateChange}
+                    ></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-2 slds-large-size_2-of-12">
+                    <lightning-input
+                        type="date"
+                        label="Allocation end date"
+                        value={allocationEndDate}
+                        min={allocationStartDate}
+                        onchange={handleEndDateChange}
+                    ></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-large-size_3-of-12">
+                    <lightning-button
+                        label="Assign to project"
+                        variant="brand"
+                        onclick={handleAssign}
+                        disabled={isAssignDisabled}
+                        class="slds-m-top_small"
+                    ></lightning-button>
+                </div>
+            </div>
+
+            <template lwc:if={isSaving}>
+                <lightning-spinner alternative-text="Assigning employee" size="small"></lightning-spinner>
+            </template>
+
+            <div class="slds-m-top_large">
+                <div class="slds-grid slds-grid_align-spread slds-m-bottom_x-small">
+                    <h2 class="slds-text-heading_small">Assigned team</h2>
+                    <span class="slds-text-body_small">{teamCount} shown (up to 200)</span>
+                </div>
+
+                <template lwc:if={hasLoadError}>
+                    <div class="slds-text-color_error" role="alert">{loadError}</div>
+                </template>
+                <template lwc:elseif={hasTeamRows}>
+                    <lightning-datatable
+                        key-field="allocationId"
+                        data={teamRows}
+                        columns={columns}
+                        hide-checkbox-column
+                    ></lightning-datatable>
+                </template>
+                <template lwc:else>
+                    <div class="slds-box slds-theme_default slds-text-align_center">
+                        No employees are assigned to this project yet.
+                    </div>
+                </template>
+            </div>
+        </div>
+    </lightning-card>
+</template>

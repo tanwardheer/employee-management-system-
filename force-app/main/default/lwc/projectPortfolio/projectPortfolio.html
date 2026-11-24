@@ -1,0 +1,54 @@
+<template>
+    <lightning-card title="Projects Overview" icon-name="standard:work_order">
+        <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+            <p class="slds-text-color_weak slds-m-bottom_medium">
+                Search projects, filter by status, and open a project to manage its assigned team.
+            </p>
+
+            <div class="slds-grid slds-wrap slds-gutters slds-m-bottom_medium">
+                <div class="slds-col slds-size_1-of-1 slds-large-size_8-of-12">
+                    <lightning-input
+                        type="search"
+                        label="Search projects"
+                        placeholder="Search by project, code, client, or status"
+                        onchange={handleSearch}>
+                    </lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-large-size_4-of-12">
+                    <lightning-combobox
+                        label="Project status"
+                        value={selectedStatus}
+                        options={statusOptions}
+                        onchange={handleStatusChange}>
+                    </lightning-combobox>
+                </div>
+            </div>
+
+            <p class="slds-text-body_small slds-m-bottom_x-small">
+                Showing {projectCount} project(s)
+            </p>
+
+            <template lwc:if={hasError}>
+                <div class="slds-text-color_error" role="alert">
+                    Projects could not be loaded. Check your access and try again.
+                </div>
+            </template>
+            <template lwc:elseif={hasProjects}>
+                <lightning-datatable
+                    key-field="Id"
+                    data={visibleProjects}
+                    columns={columns}
+                    sorted-by={sortedBy}
+                    sorted-direction={sortDirection}
+                    onsort={handleSort}
+                    hide-checkbox-column>
+                </lightning-datatable>
+            </template>
+            <template lwc:else>
+                <div class="slds-box slds-theme_default slds-text-align_center">
+                    No projects match those filters.
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>
